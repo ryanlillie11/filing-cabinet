@@ -1,26 +1,173 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Manila folder / kraft paper / india ink palette */
+  --color-paper: #f1e9d4;
+  --color-paper-dark: #e6dbbe;
+  --color-card: #f7f1df;
+  --color-manila: #e3cd9e;
+  --color-manila-dark: #cfb27a;
+  --color-kraft: #b0885a;
+  --color-ink: #262218;
+  --color-faded: #6f654b;
+  --color-stamp: #a33327;
+  --color-ledger: #3c5340;
+  --color-tab: #d94f30;
+
+  --font-typewriter: var(--font-special-elite), "Courier New", monospace;
+  --font-mono: var(--font-courier-prime), "Courier New", monospace;
+  --font-body: var(--font-libre-franklin), Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-paper);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  /* subtle paper grain */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* index card with ruled lines */
+.index-card {
+  background-color: var(--color-card);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgba(103, 130, 158, 0.22) 28px
+  );
+  border: 1px solid rgba(38, 34, 24, 0.35);
+  box-shadow: 2px 3px 0 rgba(38, 34, 24, 0.18);
+}
+.index-card-rule {
+  border-bottom: 2px solid rgba(163, 51, 39, 0.45);
+}
+
+/* manila folder panel with a tab */
+.folder-panel {
+  background: var(--color-manila);
+  border: 1px solid rgba(38, 34, 24, 0.4);
+  box-shadow: 3px 4px 0 rgba(38, 34, 24, 0.22);
+}
+.folder-tab {
+  background: var(--color-manila);
+  border: 1px solid rgba(38, 34, 24, 0.4);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+}
+
+/* rubber stamp */
+.stamp {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 3px double currentColor;
+  padding: 0.1em 0.45em;
+  transform: rotate(-4deg);
+  display: inline-block;
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-4deg) scale(2.4);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-4deg) scale(0.92);
+  }
+  100% {
+    transform: rotate(-4deg) scale(1);
+  }
+}
+.stamp-animate {
+  animation: stamp-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+/* receipt tape */
+.receipt-tape {
+  background: #fbf7ea;
+  border-left: 1px dashed rgba(38, 34, 24, 0.4);
+  border-right: 1px dashed rgba(38, 34, 24, 0.4);
+  font-family: var(--font-mono);
+}
+.receipt-edge {
+  height: 10px;
+  background:
+    linear-gradient(-45deg, transparent 6px, #fbf7ea 0) 0 0 / 12px 100%,
+    linear-gradient(45deg, transparent 6px, #fbf7ea 0) 6px 0 / 12px 100%;
+  background-repeat: repeat-x;
+}
+
+/* ledger table */
+.ledger {
+  font-family: var(--font-mono);
+  background: #f4efdf;
+  border: 1px solid rgba(38, 34, 24, 0.4);
+}
+.ledger tr + tr {
+  border-top: 1px solid rgba(60, 83, 64, 0.3);
+}
+
+/* chunky tactile button */
+.btn {
+  font-family: var(--font-mono);
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-paper-dark);
+  box-shadow: 2px 2px 0 var(--color-ink);
+  padding: 0.25rem 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-ink);
+}
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--color-ink);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.btn-stamp {
+  background: var(--color-stamp);
+  color: #f7f1df;
+  border-color: #6d1f16;
+  box-shadow: 2px 2px 0 #6d1f16;
+}
+.btn-ledger {
+  background: var(--color-ledger);
+  color: #f7f1df;
+  border-color: #22301f;
+  box-shadow: 2px 2px 0 #22301f;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-mono);
+  background: #fbf7ea;
+  border: 1.5px solid rgba(38, 34, 24, 0.6);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--color-tab);
+  outline-offset: 1px;
+}
+
+.typewriter {
+  font-family: var(--font-typewriter);
+}
+.mono {
+  font-family: var(--font-mono);
 }
