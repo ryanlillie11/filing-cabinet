@@ -15,7 +15,11 @@ export async function POST(req: Request) {
   const { data, error } = await supabase().from("documents").select().eq("id", id).single();
   if (error || !data) return NextResponse.json({ error: "not found" }, { status: 404 });
   const row = data as DocumentRow;
-  if (row.status !== "processing") {
+  // Allow retrying a doc that previously failed (e.g. a transient 529 from
+  // Anthropic) as long as the staged file is still there. Anything else
+  // already-classified is returned as-is rather than re-running Claude.
+  const retryable = row.status === "processing" || row.status === "needs_attention";
+  if (!retryable || !row.storage_path) {
     return NextResponse.json({ documents: [row] });
   }
 

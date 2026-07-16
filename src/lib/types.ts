@@ -25,6 +25,8 @@ export interface DocumentRow {
   ai_confidence: number | null;
   low_confidence: boolean;
   proposed_subfolder: string | null;
+  from_previous_owner: boolean;
+  equipment_label: string | null;
   raw_extracted_text: string | null;
   original_filename: string | null;
   filename: string | null;
@@ -55,5 +57,7 @@ export type EditableFields = Partial<
     | "warranty_expiration"
     | "description"
     | "proposed_subfolder"
+    | "from_previous_owner"
+    | "equipment_label"
   >
 >;

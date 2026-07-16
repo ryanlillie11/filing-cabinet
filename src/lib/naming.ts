@@ -1,19 +1,34 @@
 import { CATEGORIES, type CategoryKey } from "./taxonomy";
 
-/** Clean a vendor name for use in a filename: drop legal suffixes, no yelling. */
-export function normalizeVendor(vendor: string): string {
+function cleanVendorWords(vendor: string): string[] {
   const stripped = vendor
     .replace(/[,.]?\s*\b(llc|inc|corp|co|ltd|llp|pllc|plc|company|incorporated)\b\.?/gi, "")
     .replace(/[^a-zA-Z0-9\s&-]/g, "")
     .trim();
-  if (!stripped) return "Unknown";
+  if (!stripped) return ["Unknown"];
   const words = stripped.split(/[\s&-]+/).filter(Boolean);
-  const cased = words.map((w) =>
+  return words.map((w) =>
     w === w.toUpperCase() && w.length > 3
       ? w.charAt(0) + w.slice(1).toLowerCase() // de-yell ALLCAPS words
       : w.charAt(0).toUpperCase() + w.slice(1)
   );
-  return cased.join("").slice(0, 40);
+}
+
+/** Clean + concatenate a vendor name for the strict Category_Date_Vendor filename convention. */
+export function normalizeVendor(vendor: string): string {
+  return cleanVendorWords(vendor).join("").slice(0, 40);
+}
+
+/** Clean but keep spaces — for the human-readable manual naming convention. */
+export function displayVendor(vendor: string): string {
+  return cleanVendorWords(vendor).join(" ").slice(0, 60);
+}
+
+function sanitizeFilename(s: string): string {
+  return s
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function extensionFor(mimeType: string): string {
@@ -23,15 +38,32 @@ export function extensionFor(mimeType: string): string {
   return "bin";
 }
 
-/** Build the standardized filename: {Category}_{YYYY-MM-DD}_{Vendor}.{ext} */
-export function standardFilename(
-  category: CategoryKey,
-  date: string, // YYYY-MM-DD
-  vendorNormalized: string,
-  mimeType: string,
-  disambiguator?: number
-): string {
-  const prefix = CATEGORIES[category].filePrefix;
-  const suffix = disambiguator && disambiguator > 1 ? `_${disambiguator}` : "";
-  return `${prefix}_${date}_${vendorNormalized || "Unknown"}${suffix}.${extensionFor(mimeType)}`;
+/**
+ * Build the filed filename. Manuals use a simple human-readable convention
+ * ("Hayward AQR-15 Chlorinator Manual.pdf") rather than the strict
+ * Category_Date_Vendor pattern, since a manual has no meaningful document
+ * date and the point is to recognize it at a glance.
+ */
+export function standardFilename(opts: {
+  category: CategoryKey;
+  date: string; // YYYY-MM-DD
+  vendor: string; // raw/display vendor, e.g. "Hayward Pool Products"
+  vendorNormalized: string; // concatenated, e.g. "HaywardPoolProducts"
+  mimeType: string;
+  equipmentLabel?: string | null;
+  disambiguator?: number;
+}): string {
+  const ext = extensionFor(opts.mimeType);
+
+  if (opts.category === "manual") {
+    const vendorDisplay = displayVendor(opts.vendor);
+    const label = opts.equipmentLabel?.trim();
+    const base = label ? `${vendorDisplay} ${label} Manual` : `${vendorDisplay} Manual`;
+    const suffix = opts.disambiguator && opts.disambiguator > 1 ? ` ${opts.disambiguator}` : "";
+    return `${sanitizeFilename(base)}${suffix}.${ext}`;
+  }
+
+  const prefix = CATEGORIES[opts.category].filePrefix;
+  const suffix = opts.disambiguator && opts.disambiguator > 1 ? `_${opts.disambiguator}` : "";
+  return `${prefix}_${opts.date}_${opts.vendorNormalized || "Unknown"}${suffix}.${ext}`;
 }

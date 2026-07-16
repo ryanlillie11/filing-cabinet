@@ -13,6 +13,8 @@ export interface DocPatch {
   invoice_open: boolean;
   warranty_expiration: string;
   description: string;
+  from_previous_owner: boolean;
+  equipment_label: string;
 }
 
 export function patchFromDoc(doc: DocumentRow): DocPatch {
@@ -25,6 +27,8 @@ export function patchFromDoc(doc: DocumentRow): DocPatch {
     invoice_open: doc.invoice_open,
     warranty_expiration: doc.warranty_expiration ?? "",
     description: doc.description ?? "",
+    from_previous_owner: doc.from_previous_owner,
+    equipment_label: doc.equipment_label ?? "",
   };
 }
 
@@ -38,6 +42,8 @@ export function patchToBody(p: DocPatch) {
     invoice_open: p.invoice_open,
     warranty_expiration: p.warranty_expiration || null,
     description: p.description,
+    from_previous_owner: p.from_previous_owner,
+    equipment_label: p.equipment_label || null,
   };
 }
 
@@ -108,6 +114,16 @@ export default function DocEditForm({
           />
         </label>
       </div>
+      {p.category === "manual" && (
+        <label className="flex flex-col gap-1">
+          <span className="uppercase text-faded">Equipment / model (for manual filename)</span>
+          <input
+            placeholder='e.g. "AQR-15 Chlorinator"'
+            value={p.equipment_label}
+            onChange={(e) => set("equipment_label", e.target.value)}
+          />
+        </label>
+      )}
       <label className="flex flex-col gap-1">
         <span className="uppercase text-faded">Description</span>
         <textarea
@@ -123,6 +139,14 @@ export default function DocEditForm({
           onChange={(e) => set("invoice_open", e.target.checked)}
         />
         <span className="uppercase">Unpaid / open invoice</span>
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={p.from_previous_owner}
+          onChange={(e) => set("from_previous_owner", e.target.checked)}
+        />
+        <span className="uppercase">From previous owner (files to Historical)</span>
       </label>
       <div className="flex gap-2 pt-1">
         <button className="btn btn-ledger" disabled={saving} onClick={() => onSave(p)}>

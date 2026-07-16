@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   let query = supabase()
     .from("documents")
     .select(
-      "id,status,source,category,house_system,vendor,doc_date,date_source,amount,invoice_open,warranty_expiration,description,ai_confidence,low_confidence,filename,original_filename,drive_link,drive_folder_path,possible_duplicate_of,upload_date,created_at"
+      "id,status,source,category,house_system,vendor,doc_date,date_source,amount,invoice_open,warranty_expiration,description,ai_confidence,low_confidence,filename,original_filename,drive_link,drive_folder_path,possible_duplicate_of,from_previous_owner,equipment_label,upload_date,created_at"
     )
     .not("status", "in", '("split","discarded")')
     .order("created_at", { ascending: false })

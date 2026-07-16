@@ -81,24 +81,39 @@ export const HOUSE_SYSTEMS: Record<HouseSystemKey, { label: string; systemFolder
   general: { label: "General / Whole-House" },
 };
 
+export const HISTORICAL_FOLDER = "Historical (Previous Owner)";
+export const MANUALS_SUBFOLDER = "Manuals";
+
 /**
  * Resolve the Drive folder path segments (under the root folder) for a doc.
  * Manuals for a recognized appliance system file under
- * "Appliances & Systems/<System>", matching the proposed tree; everything
- * else files by category. A model-proposed subfolder nests one level deeper.
+ * "Appliances & Systems/<System>/Manuals" (its own "manual section"), matching
+ * the proposed tree; everything else files by category. Docs flagged
+ * from_previous_owner file into a "Historical (Previous Owner)" bucket for
+ * that system (or nested under the category folder if there's no system)
+ * instead — historical takes priority over the Manuals subfolder so the two
+ * stay peer sections rather than nested. A model-proposed subfolder nests one
+ * level deeper.
  */
 export function folderPathFor(
   category: CategoryKey,
   houseSystem: HouseSystemKey | null,
-  proposedSubfolder?: string | null
+  proposedSubfolder?: string | null,
+  fromPreviousOwner?: boolean
 ): string[] {
   let segments: string[];
   const systemFolder = houseSystem ? HOUSE_SYSTEMS[houseSystem]?.systemFolder : undefined;
-  if (category === "manual" && systemFolder) {
-    segments = ["Appliances & Systems", systemFolder];
+
+  if (fromPreviousOwner) {
+    segments = systemFolder
+      ? ["Appliances & Systems", systemFolder, HISTORICAL_FOLDER]
+      : [CATEGORIES[category].folder, HISTORICAL_FOLDER];
+  } else if (category === "manual" && systemFolder) {
+    segments = ["Appliances & Systems", systemFolder, MANUALS_SUBFOLDER];
   } else {
     segments = [CATEGORIES[category].folder];
   }
+
   if (proposedSubfolder && category !== "uncategorized") {
     segments.push(proposedSubfolder.replace(/[/\\]/g, "-").trim());
   }

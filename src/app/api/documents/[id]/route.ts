@@ -18,6 +18,8 @@ const EDITABLE = [
   "warranty_expiration",
   "description",
   "proposed_subfolder",
+  "from_previous_owner",
+  "equipment_label",
 ] as const;
 
 // PATCH: edit fields on any document (pending OR already filed).

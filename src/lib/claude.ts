@@ -41,6 +41,17 @@ const ExtractedDocSchema = z.object({
     .describe(
       "Only if the doc clearly needs a new subfolder that doesn't fit the fixed taxonomy; strongly prefer null"
     ),
+  from_previous_owner: z
+    .boolean()
+    .describe(
+      "True only if the document text gives clear evidence it came from the home's previous owner/seller (e.g. left-behind manuals, a transferred warranty, closing/inspection paperwork) rather than something the current owner obtained. Default false when there's no such evidence — this is not a guess based on document age."
+    ),
+  equipment_label: z
+    .string()
+    .nullable()
+    .describe(
+      "Only for category=manual: a short label combining model/equipment type for filing, e.g. 'AQR-15 Chlorinator' or 'RA0406A Pool Heater'. Null for every other category."
+    ),
   confidence: z.number().describe("Your classification confidence, 0 to 1"),
   extracted_text: z
     .string()
@@ -76,6 +87,8 @@ Rules:
 - Use "uncategorized" only when nothing fits; it's a flagged fallback, not a dumping ground.
 - Prefer the fixed taxonomy over proposing new subfolders; proposed_subfolder should almost always be null.
 - Vendor: the company that issued the document, cleaned (no "LLC", no ALL-CAPS yelling).
+- from_previous_owner: only true with explicit textual evidence (e.g. the doc names a prior homeowner, is addressed to a different resident, or is described as left behind at closing). Do not infer it just because a manual looks old.
+- equipment_label: only for category=manual — a short "model + equipment type" string like "AQR-15 Chlorinator" used to build a simple filename ("Hayward AQR-15 Chlorinator Manual.pdf"), not a full sentence.
 - confidence reflects the whole classification (category + vendor + date), not just category.`;
 }
 

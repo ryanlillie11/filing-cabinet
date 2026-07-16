@@ -5,8 +5,37 @@ import { HOUSE_SYSTEMS, HOUSE_SYSTEM_KEYS, CATEGORIES } from "@/lib/taxonomy";
 import { shortDate } from "@/lib/format";
 import type { DocumentRow } from "@/lib/types";
 
+function DocList({ docs }: { docs: DocumentRow[] }) {
+  return (
+    <ul className="mono text-xs space-y-1">
+      {docs.map((d) => (
+        <li key={d.id} className="flex items-baseline gap-2">
+          <span className="text-faded whitespace-nowrap">{shortDate(d.doc_date)}</span>
+          {d.drive_link ? (
+            <a
+              href={d.drive_link}
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-dotted truncate"
+            >
+              {d.filename ?? d.original_filename}
+            </a>
+          ) : (
+            <span className="truncate">{d.filename ?? d.original_filename}</span>
+          )}
+          <span className="text-faded truncate hidden sm:inline">
+            {d.category ? CATEGORIES[d.category].label : ""}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 // The cabinet itself: one drawer per house system. Pull a drawer open to
-// browse everything filed under it.
+// browse everything filed under it, split into Manuals, Historical
+// (from the previous owner), and everything else — mirroring the Drive
+// folder structure (.../<System>/Manuals, .../<System>/Historical...).
 export default function SystemDrawers({ counts }: { counts: Record<string, number> }) {
   const [open, setOpen] = useState<string | null>(null);
   const [docs, setDocs] = useState<DocumentRow[]>([]);
@@ -27,6 +56,10 @@ export default function SystemDrawers({ counts }: { counts: Record<string, numbe
       setLoading(false);
     }
   };
+
+  const historical = docs.filter((d) => d.from_previous_owner);
+  const manuals = docs.filter((d) => !d.from_previous_owner && d.category === "manual");
+  const everythingElse = docs.filter((d) => !d.from_previous_owner && d.category !== "manual");
 
   return (
     <div>
@@ -60,28 +93,27 @@ export default function SystemDrawers({ counts }: { counts: Record<string, numbe
           ) : docs.length === 0 ? (
             <p className="mono text-xs text-faded">Empty drawer.</p>
           ) : (
-            <ul className="mono text-xs space-y-1">
-              {docs.map((d) => (
-                <li key={d.id} className="flex items-baseline gap-2">
-                  <span className="text-faded whitespace-nowrap">{shortDate(d.doc_date)}</span>
-                  {d.drive_link ? (
-                    <a
-                      href={d.drive_link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline decoration-dotted truncate"
-                    >
-                      {d.filename ?? d.original_filename}
-                    </a>
-                  ) : (
-                    <span className="truncate">{d.filename ?? d.original_filename}</span>
-                  )}
-                  <span className="text-faded truncate hidden sm:inline">
-                    {d.category ? CATEGORIES[d.category].label : ""}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-4">
+              {everythingElse.length > 0 && <DocList docs={everythingElse} />}
+
+              {manuals.length > 0 && (
+                <div>
+                  <div className="mono text-[10px] uppercase text-faded border-b border-dashed border-faded pb-0.5 mb-1">
+                    Manuals
+                  </div>
+                  <DocList docs={manuals} />
+                </div>
+              )}
+
+              {historical.length > 0 && (
+                <div>
+                  <div className="mono text-[10px] uppercase text-ledger border-b border-dashed border-ledger pb-0.5 mb-1">
+                    Historical — from the previous owner
+                  </div>
+                  <DocList docs={historical} />
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

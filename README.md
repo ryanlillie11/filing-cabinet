@@ -103,10 +103,13 @@ production redirect URI to the Google OAuth client (step 2.4).
 Created lazily on first use, under `DRIVE_ROOT_FOLDER_NAME` (default
 `House Docs`):
 
-- `Appliances & Systems/{HVAC, Pool & Hot Tub, Kitchen Appliances, Water Heater, Sump, Plumbing}` — manuals for those systems
-- `Manuals` (everything else), `Warranties`, `Invoices & Receipts`,
+- `Appliances & Systems/{HVAC, Pool & Hot Tub, Kitchen Appliances, Water Heater, Sump, Plumbing}/Manuals` — manuals for those systems, named simply (e.g. `Hayward AQR-15 Salt Chlorinator Manual.pdf`) rather than the Category_Date_Vendor pattern
+- `Appliances & Systems/<System>/Historical (Previous Owner)` — any document flagged **from previous owner** files here instead, regardless of category, so it stays a distinct "drawer section" alongside Manuals
+- `Manuals` (everything else — systems with no dedicated Appliances & Systems folder), `Warranties`, `Invoices & Receipts`,
   `Contractor & Renovation Docs`, `Permits & Municipal`, `Insurance`,
   `Tax-Relevant Home Expenses`, `Correspondence`, `Uncategorized`
+
+Claude flags **from previous owner** automatically when a document's text gives clear evidence (e.g. "left by the previous homeowner"); it's also a checkbox in the review/edit form for anything the model misses. The dashboard's house-system drawers split into **Manuals**, **Historical — from the previous owner**, and everything else to match.
 
 Filename convention: `{Category}_{YYYY-MM-DD}_{Vendor}.pdf` — date is the
 document date when extractable (flagged when it falls back to upload date),

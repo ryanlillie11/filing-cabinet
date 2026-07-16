@@ -134,8 +134,24 @@ export default function ReviewTray({ initial }: { initial: DocumentRow[] }) {
             <div className="typewriter text-lg leading-tight">
               {doc.vendor || doc.original_filename || "Unknown document"}
             </div>
-            <div className="mono text-[10px] text-faded whitespace-nowrap">
+            <div className="flex items-center gap-2 mono text-[10px] text-faded whitespace-nowrap">
+              <button
+                className="btn px-2 py-0.5"
+                disabled={idx === 0}
+                onClick={() => setIdx((i) => Math.max(0, i - 1))}
+                aria-label="Previous document"
+              >
+                ←
+              </button>
               {idx + 1} / {docs.length} in tray
+              <button
+                className="btn px-2 py-0.5"
+                disabled={idx === docs.length - 1}
+                onClick={() => setIdx((i) => Math.min(docs.length - 1, i + 1))}
+                aria-label="Next document"
+              >
+                →
+              </button>
             </div>
           </div>
 
@@ -155,6 +171,9 @@ export default function ReviewTray({ initial }: { initial: DocumentRow[] }) {
             )}
             {doc.invoice_open && (
               <span className="stamp text-stamp text-[10px]">UNPAID</span>
+            )}
+            {doc.from_previous_owner && (
+              <span className="stamp text-ledger text-[10px]">PREV OWNER</span>
             )}
             {doc.low_confidence && (
               <span className="stamp text-tab text-[10px]">LOW CONFIDENCE</span>

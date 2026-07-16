@@ -76,6 +76,8 @@ function applyExtraction(doc: ExtractedDoc, uploadDate: string) {
     warranty_expiration: doc.warranty_expiration,
     description: doc.description,
     proposed_subfolder: doc.proposed_subfolder,
+    from_previous_owner: doc.from_previous_owner,
+    equipment_label: doc.equipment_label,
     ai_confidence: doc.confidence,
     low_confidence: doc.confidence < LOW_CONFIDENCE_THRESHOLD || doc.category === "uncategorized",
     raw_extracted_text: doc.extracted_text,
@@ -220,14 +222,21 @@ export async function fileDocument(id: string): Promise<DocumentRow> {
   }
 
   const buffer = await readStagedFile(doc.storage_path);
-  const segments = folderPathFor(doc.category, doc.house_system, doc.proposed_subfolder);
-  const folder = await resolveFolder(segments);
-  const desired = standardFilename(
+  const segments = folderPathFor(
     doc.category,
-    doc.doc_date,
-    doc.vendor_normalized || normalizeVendor(doc.vendor ?? "Unknown"),
-    doc.mime_type ?? "application/pdf"
+    doc.house_system,
+    doc.proposed_subfolder,
+    doc.from_previous_owner
   );
+  const folder = await resolveFolder(segments);
+  const desired = standardFilename({
+    category: doc.category,
+    date: doc.doc_date,
+    vendor: doc.vendor ?? "Unknown",
+    vendorNormalized: doc.vendor_normalized || normalizeVendor(doc.vendor ?? "Unknown"),
+    mimeType: doc.mime_type ?? "application/pdf",
+    equipmentLabel: doc.equipment_label,
+  });
   const finalName = await availableFilename(folder.id, desired);
   const uploaded = await uploadToDrive(folder.id, finalName, doc.mime_type!, buffer);
 
@@ -259,14 +268,21 @@ export async function syncDriveAfterEdit(doc: DocumentRow): Promise<DocumentRow>
   if (doc.status !== "filed" || !doc.drive_file_id || !doc.category || !doc.doc_date) return doc;
   const db = supabase();
 
-  const segments = folderPathFor(doc.category, doc.house_system, doc.proposed_subfolder);
-  const folder = await resolveFolder(segments);
-  const desired = standardFilename(
+  const segments = folderPathFor(
     doc.category,
-    doc.doc_date,
-    doc.vendor_normalized || normalizeVendor(doc.vendor ?? "Unknown"),
-    doc.mime_type ?? "application/pdf"
+    doc.house_system,
+    doc.proposed_subfolder,
+    doc.from_previous_owner
   );
+  const folder = await resolveFolder(segments);
+  const desired = standardFilename({
+    category: doc.category,
+    date: doc.doc_date,
+    vendor: doc.vendor ?? "Unknown",
+    vendorNormalized: doc.vendor_normalized || normalizeVendor(doc.vendor ?? "Unknown"),
+    mimeType: doc.mime_type ?? "application/pdf",
+    equipmentLabel: doc.equipment_label,
+  });
 
   const needsRename = desired !== doc.filename;
   const needsMove = folder.path !== doc.drive_folder_path;
