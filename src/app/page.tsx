@@ -90,11 +90,6 @@ export default async function Dashboard() {
   const session = await auth();
   const data = await loadDashboard();
   const openTotal = data.openInvoices.reduce((s, d) => s + (d.amount ?? 0), 0);
-  const today = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  });
 
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6 w-full">
@@ -107,7 +102,6 @@ export default async function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="stamp text-ledger text-xs">RECEIVED {today}</span>
           <form
             action={async () => {
               "use server";
