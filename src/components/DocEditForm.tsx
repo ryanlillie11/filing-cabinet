@@ -66,7 +66,15 @@ export default function DocEditForm({
       <div className="grid grid-cols-2 gap-2">
         <label className="flex flex-col gap-1">
           <span className="uppercase text-faded">Category</span>
-          <select value={p.category} onChange={(e) => set("category", e.target.value)}>
+          <select
+            value={p.category}
+            onChange={(e) => {
+              const category = e.target.value;
+              // Clear the equipment label when leaving "manual" so a stale
+              // value can't linger on a document it no longer applies to.
+              setP({ ...p, category, equipment_label: category === "manual" ? p.equipment_label : "" });
+            }}
+          >
             {CATEGORY_KEYS.map((k) => (
               <option key={k} value={k}>
                 {CATEGORIES[k].label}

@@ -77,7 +77,7 @@ export async function resolveFolder(segments: string[]): Promise<{ id: string; p
   return { id: parentId, path: pathSoFar };
 }
 
-/** Find a filename that doesn't collide in the target folder (_2, _3, ...). */
+/** Find a filename that doesn't collide in the target folder (name 2, name 3, ...). */
 export async function availableFilename(
   folderId: string,
   desired: string
@@ -95,7 +95,7 @@ export async function availableFilename(
   const names = new Set((existing.data.files ?? []).map((f) => f.name));
   if (!names.has(desired)) return desired;
   for (let n = 2; n < 100; n++) {
-    const candidate = `${base}_${n}${ext}`;
+    const candidate = `${base} ${n}${ext}`;
     if (!names.has(candidate)) return candidate;
   }
   return `${base}_${Date.now()}${ext}`;
