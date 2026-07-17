@@ -1,36 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { HOUSE_SYSTEMS, HOUSE_SYSTEM_KEYS, CATEGORIES } from "@/lib/taxonomy";
-import { shortDate } from "@/lib/format";
+import { HOUSE_SYSTEMS, HOUSE_SYSTEM_KEYS } from "@/lib/taxonomy";
 import type { DocumentRow } from "@/lib/types";
-
-function DocList({ docs }: { docs: DocumentRow[] }) {
-  return (
-    <ul className="mono text-xs space-y-1">
-      {docs.map((d) => (
-        <li key={d.id} className="flex items-baseline gap-2">
-          <span className="text-faded whitespace-nowrap">{shortDate(d.doc_date)}</span>
-          {d.drive_link ? (
-            <a
-              href={d.drive_link}
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-dotted truncate"
-            >
-              {d.filename ?? d.original_filename}
-            </a>
-          ) : (
-            <span className="truncate">{d.filename ?? d.original_filename}</span>
-          )}
-          <span className="text-faded truncate hidden sm:inline">
-            {d.category ? CATEGORIES[d.category].label : ""}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
+import DocList from "./DocList";
 
 // The cabinet itself: one drawer per house system. Pull a drawer open to
 // browse everything filed under it, split into Manuals, Historical

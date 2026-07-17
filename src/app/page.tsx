@@ -1,11 +1,13 @@
 import { auth, signOut } from "@/auth";
 import { supabase } from "@/lib/supabase";
 import { money, shortDate, daysUntil } from "@/lib/format";
+import { HOME_PURCHASE_CATEGORIES } from "@/lib/taxonomy";
 import type { DocumentRow } from "@/lib/types";
 import UploadTray from "@/components/UploadTray";
 import ReviewTray from "@/components/ReviewTray";
 import SearchPanel from "@/components/SearchPanel";
 import SystemDrawers from "@/components/SystemDrawers";
+import HomePurchasePanel from "@/components/HomePurchasePanel";
 import AskCabinet from "@/components/AskCabinet";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +17,15 @@ async function loadDashboard() {
   const today = new Date().toISOString().slice(0, 10);
   const in90 = new Date(Date.now() + 90 * 86_400_000).toISOString().slice(0, 10);
 
-  const [pending, recentlyFiled, warranties, openInvoices, needsAttention, allSystems] =
-    await Promise.all([
+  const [
+    pending,
+    recentlyFiled,
+    warranties,
+    openInvoices,
+    needsAttention,
+    allSystems,
+    homePurchaseCount,
+  ] = await Promise.all([
       db
         .from("documents")
         .select()
@@ -54,6 +63,11 @@ async function loadDashboard() {
         .from("documents")
         .select("house_system")
         .not("status", "in", '("split","discarded")'),
+      db
+        .from("documents")
+        .select("id", { count: "exact", head: true })
+        .in("category", HOME_PURCHASE_CATEGORIES)
+        .not("status", "in", '("split","discarded")'),
     ]);
 
   const counts: Record<string, number> = {};
@@ -68,6 +82,7 @@ async function loadDashboard() {
     openInvoices: openInvoices.data ?? [],
     needsAttention: needsAttention.data ?? [],
     counts,
+    homePurchaseCount: homePurchaseCount.count ?? 0,
   };
 }
 
@@ -264,6 +279,11 @@ export default async function Dashboard() {
       <section className="mt-8">
         <h2 className="typewriter text-xl mb-2">THE DRAWERS — BY HOUSE SYSTEM</h2>
         <SystemDrawers counts={data.counts} />
+      </section>
+
+      {/* home purchase / closing / mortgage */}
+      <section className="mt-6 max-w-sm">
+        <HomePurchasePanel count={data.homePurchaseCount} />
       </section>
 
       <footer className="mt-10 pt-3 border-t border-dashed border-faded">

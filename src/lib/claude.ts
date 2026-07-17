@@ -85,6 +85,7 @@ Rules:
 - doc_date is the date printed on the document, never today's date. Use null if truly not extractable.
 - Distinguish invoice_paid vs invoice_open: look for "PAID" stamps, zero balance, payment confirmations vs "amount due", due dates, open balances. When unsure about payment status of an invoice, use invoice_open (it gets surfaced for action).
 - Use "uncategorized" only when nothing fits; it's a flagged fallback, not a dumping ground.
+- home_purchase, mortgage, and home_inspection are all house-purchase paperwork (they file into the same Drive folder, just labeled differently): home_purchase = purchase agreement, closing disclosure/settlement statement, title, deed, appraisal, survey; mortgage = loan documents, mortgage statements, escrow analysis, refinance paperwork, anything from the bank/lender; home_inspection = the home inspection report(s) done as part of buying the house. Don't use these for routine contractor work on the house after purchase — that's contractor_estimate/renovation_record/invoice_*.
 - Prefer the fixed taxonomy over proposing new subfolders; proposed_subfolder should almost always be null.
 - Vendor: the company that issued the document, cleaned (no "LLC", no ALL-CAPS yelling).
 - from_previous_owner: only true with explicit textual evidence (e.g. the doc names a prior homeowner, is addressed to a different resident, or is described as left behind at closing). Do not infer it just because a manual looks old.

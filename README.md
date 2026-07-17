@@ -108,6 +108,7 @@ Created lazily on first use, under `DRIVE_ROOT_FOLDER_NAME` (default
 - `Manuals` (everything else — systems with no dedicated Appliances & Systems folder), `Warranties`, `Invoices & Receipts`,
   `Contractor & Renovation Docs`, `Permits & Municipal`, `Insurance`,
   `Tax-Relevant Home Expenses`, `Correspondence`, `Uncategorized`
+- `Home Purchase & Mortgage` — closing paperwork (purchase agreement, closing disclosure, title, deed, appraisal), bank/mortgage documents (loan docs, statements, escrow, refinance), and the home inspection report(s) from the purchase. Three categories share this one folder, shown as its own dashboard section grouped by type.
 
 Claude flags **from previous owner** automatically when a document's text gives clear evidence (e.g. "left by the previous homeowner"); it's also a checkbox in the review/edit form for anything the model misses. The dashboard's house-system drawers split into **Manuals**, **Historical — from the previous owner**, and everything else to match.
 

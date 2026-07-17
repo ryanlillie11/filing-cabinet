@@ -12,6 +12,9 @@ export const CATEGORY_KEYS = [
   "renovation_record",
   "tax_expense",
   "correspondence",
+  "home_purchase",
+  "mortgage",
+  "home_inspection",
   "uncategorized",
 ] as const;
 
@@ -64,8 +67,32 @@ export const CATEGORIES: Record<
     filePrefix: "Correspondence",
     folder: "Correspondence",
   },
+  home_purchase: {
+    label: "Home Purchase / Closing",
+    filePrefix: "Closing",
+    folder: "Home Purchase & Mortgage",
+  },
+  mortgage: {
+    label: "Mortgage / Bank",
+    filePrefix: "Mortgage",
+    folder: "Home Purchase & Mortgage",
+  },
+  home_inspection: {
+    label: "Home Inspection",
+    filePrefix: "Inspection",
+    folder: "Home Purchase & Mortgage",
+  },
   uncategorized: { label: "Uncategorized", filePrefix: "Doc", folder: "Uncategorized" },
 };
+
+/** Categories that share the "Home Purchase & Mortgage" folder — used to
+ *  group them into one dashboard section (closing docs, bank/mortgage
+ *  paperwork, and the home inspection report(s) from the purchase). */
+export const HOME_PURCHASE_CATEGORIES: CategoryKey[] = [
+  "home_purchase",
+  "mortgage",
+  "home_inspection",
+];
 
 export const HOUSE_SYSTEMS: Record<HouseSystemKey, { label: string; systemFolder?: string }> = {
   pool: { label: "Pool", systemFolder: "Pool & Hot Tub" },

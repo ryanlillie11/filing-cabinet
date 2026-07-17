@@ -26,7 +26,9 @@ export async function GET(req: Request) {
   if (q) query = query.textSearch("fts", q, { type: "websearch", config: "english" });
   if (system) query = query.eq("house_system", system);
   if (status) query = query.eq("status", status);
-  if (category) query = query.eq("category", category);
+  // Accept either a single category or a comma-separated list (e.g. the
+  // Home Purchase & Mortgage dashboard section spans three categories).
+  if (category) query = query.in("category", category.split(","));
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
