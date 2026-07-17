@@ -4,6 +4,7 @@ import { logActivity, supabase } from "@/lib/supabase";
 import { syncDriveAfterEdit } from "@/lib/ingest";
 import { normalizeVendor } from "@/lib/naming";
 import { CATEGORY_KEYS, HOUSE_SYSTEM_KEYS } from "@/lib/taxonomy";
+import { serverError } from "@/lib/errors";
 import type { DocumentRow } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -57,7 +58,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     .eq("id", id)
     .select()
     .single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json(serverError(`PATCH /api/documents/${id}`, error), { status: 500 });
   await logActivity(id, "edited", { fields: Object.keys(patch) });
 
   // Filed docs: keep the Drive file's name/folder in sync with the edit.

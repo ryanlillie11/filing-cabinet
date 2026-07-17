@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { supabase } from "@/lib/supabase";
+import { serverError } from "@/lib/errors";
 
 // GET /api/documents?q=&system=&status=&category=&limit=
 export async function GET(req: Request) {
@@ -31,6 +32,6 @@ export async function GET(req: Request) {
   if (category) query = query.in("category", category.split(","));
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json(serverError("GET /api/documents", error), { status: 500 });
   return NextResponse.json({ documents: data });
 }

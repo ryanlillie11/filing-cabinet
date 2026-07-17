@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { askCabinet } from "@/lib/claude";
 import { supabase } from "@/lib/supabase";
+import { serverError } from "@/lib/errors";
 
 export const maxDuration = 120;
 
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     .not("status", "in", '("split","discarded")')
     .textSearch("fts", question, { type: "websearch", config: "english" })
     .limit(5);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json(serverError("POST /api/ask", error), { status: 500 });
 
   let docs = matches ?? [];
   if (docs.length === 0) {

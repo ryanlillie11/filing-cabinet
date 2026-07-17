@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { classifyDocument } from "@/lib/ingest";
 import { supabase } from "@/lib/supabase";
+import { serverError } from "@/lib/errors";
 import type { DocumentRow } from "@/lib/types";
 
 // Claude reads the whole file; give it room.
@@ -27,6 +28,6 @@ export async function POST(req: Request) {
     const results = await classifyDocument(row);
     return NextResponse.json({ documents: results });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json(serverError(`POST /api/classify (${id})`, err), { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { fileDocument } from "@/lib/ingest";
+import { serverError } from "@/lib/errors";
 
 export const maxDuration = 120;
 
@@ -14,6 +15,6 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     const doc = await fileDocument(id);
     return NextResponse.json({ document: doc });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json(serverError(`POST /api/documents/${id}/file`, err), { status: 500 });
   }
 }
